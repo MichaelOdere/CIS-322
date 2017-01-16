@@ -1,0 +1,77 @@
+LOG:  database system was shut down at 2017-01-16 02:40:41 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  relation "product" does not exist
+STATEMENT:  CREATE TABLE products(
+		product_pk integer REFERENCES product(product_pk) not null,
+		vendor varchar(128) not null,
+		description varchar(128) not null,
+		alt_description varchar(128) not null
+	);
+ERROR:  syntax error at or near "alt_description" at character 208
+STATEMENT:  CREATE TABLE assets(
+		asset_pk integer REFERENCES asset(asset_pk) not null,
+		product_fk integer REFERENCES product(product_pk) not null,
+		asset_tag varchar(128) not null,
+		description varchar(128) not null
+		alt_description varchar(128) not null
+	);
+ERROR:  syntax error at or near "/" at character 1
+STATEMENT:  /dt
+	;
+ERROR:  database "db_lost" does not exist
+STATEMENT:  DROP DATABASE db_lost;
+ERROR:  database "lost_db" is being accessed by other users
+DETAIL:  There is 1 other session using the database.
+STATEMENT:  DROP DATABASE lost_db;
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+FATAL:  terminating connection due to administrator command
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-16 02:42:35 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  relation "product" does not exist
+STATEMENT:  CREATE TABLE products(
+		product_pk integer REFERENCES product(product_pk) not null,
+		vendor varchar(128) not null,
+		description varchar(128) not null,
+		alt_description varchar(128) not null
+	);
+ERROR:  syntax error at or near "alt_description" at character 208
+STATEMENT:  CREATE TABLE assets(
+		asset_pk integer REFERENCES asset(asset_pk) not null,
+		product_fk integer REFERENCES product(product_pk) not null,
+		asset_tag varchar(128) not null,
+		description varchar(128) not null
+		alt_description varchar(128) not null
+	);
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-16 02:48:06 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  syntax error at or near "," at character 54
+STATEMENT:  CREATE TABLE products(
+		product_pk integer REFERENCES,
+		vendor varchar(128) not null,
+		description varchar(128) not null,
+		alt_description varchar(128) not null
+	);
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-16 02:48:53 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
