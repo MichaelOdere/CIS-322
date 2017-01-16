@@ -1,21 +1,21 @@
-CRwqEATE TABLE products(
-	product_pk integer REFERENCES product(product_pk) not null,
+CREATE TABLE products(
+	product_pk integer,
 	vendor varchar(128) not null,
 	description varchar(128) not null,
 	alt_description varchar(128) not null
 );
 
-CREAT TABLE assets(
-	asset_pk integer REFERENCES asset(asset_pk) not null,
-	product_fk integer REFERENCES product(product_pk) not null,
+CREATE TABLE assets(
+	asset_pk integer,
+	product_fk integer,
 	asset_tag varchar(128) not null,
-	description varchar(128) not null
+	description varchar(128) not null,
 	alt_description varchar(128) not null
 );
 
 CREATE TABLE vehicles(
-	vehicle_pk integer REFERENCES users(user_pk) not null,
-	asset_fk integer REFERENCES users(user_pk) not null
+	vehicle_pk integer,
+	asset_fk integer
 );
 
 CREATE TABLE facilities(
@@ -37,7 +37,7 @@ CREATE TABLE convoys(
 	request varchar(128),
 	source_fk integer,
 	dest_fk integer,
-	depart_dt timestamp
+	depart_dt timestamp,
 	arrive_dt timestamp
 );
 
