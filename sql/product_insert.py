@@ -57,12 +57,38 @@ with open('osnap_legacy/SPNV_inventory.csv') as f:
         cur.execute(stmt2, data2)
 
 with open('osnap_legacy/transit.csv') as f:
-    rows = csv.reader(csvfile)
-    stmt = "INSERT INTO facilities (common_name) SELECT (%s) WHERE NOT EXISTS (SELECT 1 FROM facilities WHERE common_name = %s)"
-    for row in rows:
-        data1 = (row['src facility'],row['src facility'])
-        data2 = (row['dst facility'],row['dst facility'])
-        cur.execute(stmt, data)
+    reader = csv.DictReader(f)
+    for row in reader:
+        stmt = "INSERT INTO facilities (common_name) SELECT (%s) WHERE NOT EXISTS (SELECT 1 FROM facilities WHERE common_name = %s)"
+
+        data11 = (row['src facility'],row['src facility'])
+        data12 = (row['dst facility'],row['dst facility'])
+
+        cur.execute(stmt, data11)
+        cur.execute(stmt, data12)
+
+        tags = row['asset tag'].split(', ')
+
+        for tag in tags:
+            tag1_stmt = "INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = %s), (SELECT facility_pk FROM facilities WHERE common_name = %s))"
+            tag2_stmt = "UPDATE asset_at SET depart_dt=%s WHERE ((facility_fk=(SELECT facility_pk FROM facilities WHERE common_name=%s)) AND (asset_fk=(SELECT asset_pk FROM assets WHERE asset_tag=%s)))"
+            cur.execute(tag1_stmt, (tag,row['src facility']))
+            cur.execute(tag2_stmt, (row['depart date'],row['src facility'],tag))
+            cur.execute(tag1_stmt, (tag,row['dst facility']))
+            cur.execute(tag2_stmt, (row['arrive date'],row['dst facility'],tag))
+
+with open('osnap_legacy/security_levels.csv') as f:
+    reader = csv.DictReader(f)
+
+    for row in reader:
+        stmt = "INSERT INTO levels (abbrv, comment) VALUES (%s, %s)"
+        cur.execute(stmt,(row['level'],row['description']))
+
+with open('osnap_legacy/security_compartments.csv') as f:
+    reader = csv.DictReader(f)
+    for row in reader:
+        stmt = "INSERT INTO compartments (abbrv, comment) VALUES (%s, %s)"
+        cur.execute(stmt,(row['compartment_tag'],row['compartment_desc']))
 
 # commit the changes to the database
 conn.commit()
