@@ -1,16 +1,16 @@
 CREATE TABLE products(
 	product_pk serial primary key,
-	vendor varchar(16) not null,
-	description varchar(128) not null,
-	alt_description varchar(128) not null
+	vendor varchar(16),
+	description varchar(128),
+	alt_description varchar(128)
 );
 
 CREATE TABLE assets(
 	asset_pk serial primary key,
 	product_fk integer REFERENCES products(product_pk) not null,
-	asset_tag varchar(16) not null,
-	description varchar(16) not null,
-	alt_description varchar(16) not null
+	asset_tag varchar(16),
+	description varchar(16),
+	alt_description varchar(16)
 );
 
 CREATE TABLE vehicles(
@@ -20,9 +20,9 @@ CREATE TABLE vehicles(
 
 CREATE TABLE facilities(
 	facility_pk serial primary key,
-	fcode varchar(16) not null,
-	common_name varchar(16) not null,
-	location varchar(16) not null
+	fcode varchar(16),
+	common_name varchar(16),
+	location varchar(16)
 );
 
 CREATE TABLE asset_at(
