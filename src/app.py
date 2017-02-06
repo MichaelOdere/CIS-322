@@ -32,7 +32,9 @@ def report_filter():
 def facility_inventory_report():
    
     select = request.form.get('facility')
-    date = request.form.get('date')
+    # The below dates would be used if my db had dates
+    #date_begin = request.form.get('date_begin')
+    #date_end = request.form.get('date_end')
     cur.execute("SELECT facilities.common_name, assets.asset_tag, assets.description, asset_at.arrive_dt, asset_at.depart_dt FROM facilities, assets, asset_at WHERE assets.asset_pk=asset_at.asset_fk AND asset_at.facility_fk=facilities.facility_pk AND facilities.common_name = %s", [select])
     res = cur.fetchall()
     print (res)

@@ -1578,3 +1578,371 @@ LOG:  MultiXact member wraparound protections are now enabled
 LOG:  database system is ready to accept connections
 LOG:  autovacuum launcher started
 WARNING:  worker took too long to start; canceled
+LOG:  database system was shut down at 2017-01-24 00:06:29 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-24 00:07:33 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  database "lost_db" does not exist
+STATEMENT:  DROP DATABASE lost_db;
+FATAL:  database "osnapdev" does not exist
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-24 00:13:05 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+WARNING:  worker took too long to start; canceled
+WARNING:  worker took too long to start; canceled
+LOG:  database system was interrupted; last known up at 2017-01-24 00:13:07 UTC
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  redo starts at 0/1787300
+LOG:  invalid record length at 0/17EEDC8
+LOG:  redo done at 0/17EEDA0
+LOG:  last completed transaction was at log time 2017-01-24 00:13:08.346831+00
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-24 00:28:37 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  database "lost_db" is being accessed by other users
+DETAIL:  There is 1 other session using the database.
+STATEMENT:  DROP DATABASE lost_db;
+ERROR:  database "lost_db" already exists
+STATEMENT:  CREATE DATABASE lost_db;
+ERROR:  relation "products" already exists
+STATEMENT:  CREATE TABLE products(
+		product_pk serial primary key,
+		vendor varchar(16),
+		description varchar(128),
+		alt_description varchar(128)
+	);
+ERROR:  relation "assets" already exists
+STATEMENT:  CREATE TABLE assets(
+		asset_pk serial primary key,
+		product_fk integer REFERENCES products(product_pk) not null,
+		asset_tag varchar(16),
+		description varchar(16),
+		alt_description varchar(16)
+	);
+ERROR:  relation "vehicles" already exists
+STATEMENT:  CREATE TABLE vehicles(
+		vehicle_pk serial primary key,
+		asset_fk integer REFERENCES assets(asset_pk) not null
+	);
+ERROR:  relation "facilities" already exists
+STATEMENT:  CREATE TABLE facilities(
+		facility_pk serial primary key,
+		fcode varchar(16),
+		common_name varchar(16),
+		location varchar(16)
+	);
+ERROR:  relation "asset_at" already exists
+STATEMENT:  CREATE TABLE asset_at(
+		asset_fk integer REFERENCES assets(asset_pk) not null,
+		facility_fk integer REFERENCES facilities(facility_pk) not null,
+		arrive_dt timestamp,
+		depart_dt timestamp
+	);
+ERROR:  relation "convoys" already exists
+STATEMENT:  CREATE TABLE convoys(
+		convoy_pk  serial primary key,
+		request varchar(16),
+		source_fk integer REFERENCES facilities(facility_pk) not null,
+		dest_fk integer REFERENCES facilities(facility_pk) not null,
+		depart_dt timestamp,
+		arrive_dt timestamp
+	);
+ERROR:  relation "used_by" already exists
+STATEMENT:  CREATE TABLE used_by(
+		vehicle_fk integer REFERENCES vehicles(vehicle_pk) not null,
+		convok_fk integer
+	);
+ERROR:  relation "asset_on" already exists
+STATEMENT:  CREATE TABLE asset_on(
+		asset_fk integer  REFERENCES assets(asset_pk) not null,
+		convoy_fk integer REFERENCES convoys(convoy_pk) not null,
+		load_dt timestamp,
+		unload_dt timestamp
+	);
+ERROR:  relation "users" already exists
+STATEMENT:  CREATE TABLE users(
+		user_pk  serial primary key,
+		username varchar(128),
+		active boolean
+	);
+ERROR:  relation "roles" already exists
+STATEMENT:  CREATE TABLE roles(
+		role_pk serial primary key,
+		title varchar(16)
+	);
+ERROR:  relation "user_is" already exists
+STATEMENT:  CREATE TABLE user_is(
+		user_fk integer REFERENCES users(user_pk) not null,
+		role_fk integer REFERENCES roles(role_pk) not null
+	);
+ERROR:  relation "user_supports" already exists
+STATEMENT:  CREATE TABLE user_supports(
+		user_fk integer REFERENCES users(user_pk) not null,
+		facility_fk integer REFERENCES facilities(facility_pk) not null
+	);
+ERROR:  relation "levels" already exists
+STATEMENT:  CREATE TABLE levels(
+		level_pk serial primary key,
+		abbrv varchar(128),
+		comment varchar(128)
+	);
+ERROR:  relation "compartments" already exists
+STATEMENT:  CREATE TABLE compartments(
+		compartment_pk serial primary key,
+		abbrv varchar(128),
+		comment varchar(128)
+	);
+ERROR:  relation "security_tags" already exists
+STATEMENT:  CREATE TABLE security_tags(
+		tag_pk serial primary key,
+		level_fk integer REFERENCES levels(level_pk) not null,
+		compartment_fk integer REFERENCES compartments(compartment_pk) not null, 
+		user_fk integer REFERENCES users(user_pk) not null,
+		product_fk integer REFERENCES products(product_pk) not null,
+		asset_fk integer REFERENCES assets(asset_pk) not null
+	);
+ERROR:  database "thedb" does not exist
+STATEMENT:  REVOKE CONNECT ON DATABASE thedb FROM public;
+ERROR:  database "lost_db" is being accessed by other users
+DETAIL:  There are 3 other sessions using the database.
+STATEMENT:  DROP DATABASE lost_db;
+ERROR:  database "lost_db" already exists
+STATEMENT:  CREATE DATABASE lost_db;
+ERROR:  relation "products" already exists
+STATEMENT:  CREATE TABLE products(
+		product_pk serial primary key,
+		vendor varchar(16),
+		description varchar(128),
+		alt_description varchar(128)
+	);
+ERROR:  relation "assets" already exists
+STATEMENT:  CREATE TABLE assets(
+		asset_pk serial primary key,
+		product_fk integer REFERENCES products(product_pk) not null,
+		asset_tag varchar(16),
+		description varchar(16),
+		alt_description varchar(16)
+	);
+ERROR:  relation "vehicles" already exists
+STATEMENT:  CREATE TABLE vehicles(
+		vehicle_pk serial primary key,
+		asset_fk integer REFERENCES assets(asset_pk) not null
+	);
+ERROR:  relation "facilities" already exists
+STATEMENT:  CREATE TABLE facilities(
+		facility_pk serial primary key,
+		fcode varchar(16),
+		common_name varchar(16),
+		location varchar(16)
+	);
+ERROR:  relation "asset_at" already exists
+STATEMENT:  CREATE TABLE asset_at(
+		asset_fk integer REFERENCES assets(asset_pk) not null,
+		facility_fk integer REFERENCES facilities(facility_pk) not null,
+		arrive_dt timestamp,
+		depart_dt timestamp
+	);
+ERROR:  relation "convoys" already exists
+STATEMENT:  CREATE TABLE convoys(
+		convoy_pk  serial primary key,
+		request varchar(16),
+		source_fk integer REFERENCES facilities(facility_pk) not null,
+		dest_fk integer REFERENCES facilities(facility_pk) not null,
+		depart_dt timestamp,
+		arrive_dt timestamp
+	);
+ERROR:  relation "used_by" already exists
+STATEMENT:  CREATE TABLE used_by(
+		vehicle_fk integer REFERENCES vehicles(vehicle_pk) not null,
+		convok_fk integer
+	);
+ERROR:  relation "asset_on" already exists
+STATEMENT:  CREATE TABLE asset_on(
+		asset_fk integer  REFERENCES assets(asset_pk) not null,
+		convoy_fk integer REFERENCES convoys(convoy_pk) not null,
+		load_dt timestamp,
+		unload_dt timestamp
+	);
+ERROR:  relation "users" already exists
+STATEMENT:  CREATE TABLE users(
+		user_pk  serial primary key,
+		username varchar(128),
+		active boolean
+	);
+ERROR:  relation "roles" already exists
+STATEMENT:  CREATE TABLE roles(
+		role_pk serial primary key,
+		title varchar(16)
+	);
+ERROR:  relation "user_is" already exists
+STATEMENT:  CREATE TABLE user_is(
+		user_fk integer REFERENCES users(user_pk) not null,
+		role_fk integer REFERENCES roles(role_pk) not null
+	);
+ERROR:  relation "user_supports" already exists
+STATEMENT:  CREATE TABLE user_supports(
+		user_fk integer REFERENCES users(user_pk) not null,
+		facility_fk integer REFERENCES facilities(facility_pk) not null
+	);
+ERROR:  relation "levels" already exists
+STATEMENT:  CREATE TABLE levels(
+		level_pk serial primary key,
+		abbrv varchar(128),
+		comment varchar(128)
+	);
+ERROR:  relation "compartments" already exists
+STATEMENT:  CREATE TABLE compartments(
+		compartment_pk serial primary key,
+		abbrv varchar(128),
+		comment varchar(128)
+	);
+ERROR:  relation "security_tags" already exists
+STATEMENT:  CREATE TABLE security_tags(
+		tag_pk serial primary key,
+		level_fk integer REFERENCES levels(level_pk) not null,
+		compartment_fk integer REFERENCES compartments(compartment_pk) not null, 
+		user_fk integer REFERENCES users(user_pk) not null,
+		product_fk integer REFERENCES products(product_pk) not null,
+		asset_fk integer REFERENCES assets(asset_pk) not null
+	);
+LOG:  database system was interrupted; last known up at 2017-01-24 00:34:03 UTC
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  redo starts at 0/18829A8
+LOG:  invalid record length at 0/18AD848
+LOG:  redo done at 0/18AD820
+LOG:  last completed transaction was at log time 2017-01-24 00:34:29.445148+00
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-24 00:37:43 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  syntax error at or near "l" at character 16
+STATEMENT:  table products
+	l
+	;
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT 1 FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                LOG:  database system was interrupted; last known up at 2017-01-24 02:03:36 UTC
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  redo starts at 0/19B49F8
+LOG:  invalid record length at 0/19E0430
+LOG:  redo done at 0/19E0408
+LOG:  last completed transaction was at log time 2017-01-24 02:07:18.943283+00
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-01-24 07:09:33 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  syntax error at or near "LIMIT" at character 181
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005')LIMIT 1)
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+                                                                                                                                                                                                                                    LOG:  database system was interrupted; last known up at 2017-01-24 08:28:36 UTC
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  redo starts at 0/1BD55E0
+LOG:  invalid record length at 0/1BD7270
+LOG:  redo done at 0/1BD7248
+LOG:  last completed transaction was at log time 2017-01-24 08:29:36.214147+00
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+LOG:  received fast shutdown request
+LOG:  aborting any active transactions
+LOG:  autovacuum launcher shutting down
+LOG:  shutting down
+LOG:  database system is shut down
+LOG:  database system was shut down at 2017-02-04 01:50:54 UTC
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  relation "products" does not exist at character 13
+STATEMENT:  INSERT INTO products (vendor, description, alt_description) VALUES ('big n large', '1L H2O', '1L H2O vergeze spring fed')
+FATAL:  database "osnapdev" does not exist
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+FATAL:  role "create_tables.sql" does not exist
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+FATAL:  database "lost" does not exist
+FATAL:  database "lost" does not exist
+FATAL:  database "lost" does not exist
+FATAL:  database "osnapdev" does not exist
+FATAL:  database "osnapdev" does not exist
+ERROR:  column "vehicles" does not exist at character 8
+STATEMENT:  select vehicles;
+ERROR:  relation "asset" does not exist at character 15
+STATEMENT:  select * from asset;
+ERROR:  syntax error at or near "Site" at character 58
+STATEMENT:  SELECT facility_pk FROM facilities WHERE common_name = ''Site 300''
+ERROR:  syntax error at or near "facilities" at character 10
+STATEMENT:  select * facilities;
+ERROR:  syntax error at or near "SELECT" at character 231
+STATEMENT:  SELECT facilities.common_name, assets.asset_tag, assets.description, asset_at.arrive_dt, asset_at.depart_dt FROM facilities, assets, asset_at WHERE assets.asset_pk=asset_at.asset_fk AND asset_at.facility_fk=facilities.facility_pk
+	SELECT facilities.common_name, assets.asset_tag, assets.description, asset_at.arrive_dt, asset_at.depart_dt FROM facilities, assets, asset_at WHERE assets.asset_pk=asset_at.asset_fk AND asset_at.facility_fk=facilities.facility_pk
+	;
+ERROR:  relation "asset_a" does not exist at character 113
+STATEMENT:  SELECT f.common_name, a.asset_tag, a.description, aa.arrive_dt, aa.depart_dt FROM facilities as f, assets as a, asset_a as aa WHERE a.asset_pk=aa.asset_fk AND aa.facility_fk = f.facility_pk AND f.common_name = 'Site 300'
+ERROR:  current transaction is aborted, commands ignored until end of transaction block
+STATEMENT:  SELECT f.common_name, a.asset_tag, a.description, aa.arrive_dt, aa.depart_dt FROM facilities as f, assets as a, asset_a as aa WHERE a.asset_pk=aa.asset_fk AND aa.facility_fk = f.facility_pk AND f.common_name = 'Site 300'
+ERROR:  current transaction is aborted, commands ignored until end of transaction block
+STATEMENT:  SELECT common_name FROM facilities
+LOG:  database system was interrupted; last known up at 2017-02-04 02:44:37 UTC
+LOG:  database system was not properly shut down; automatic recovery in progress
+LOG:  invalid record length at 0/1EF6440
+LOG:  redo is not required
+LOG:  MultiXact member wraparound protections are now enabled
+LOG:  database system is ready to accept connections
+LOG:  autovacuum launcher started
+ERROR:  more than one row returned by a subquery used as an expression
+STATEMENT:  INSERT INTO asset_at (asset_fk, facility_fk) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag = 'CA15467287'), (SELECT facility_pk FROM facilities WHERE common_name = 'MB 005'))
+ERROR:  syntax error at or near "cur" at character 1
+STATEMENT:  cur.execute("SELECT facilities.common_name, assets.asset_tag, assets.description, asset_at.arrive_dt, asset_at.depart_dt FROM facilities, assets, asset_at WHERE assets.asset_pk=asset_at.asset_fk AND asset_at.facility_fk=facilities.facility_pk")
+	;
