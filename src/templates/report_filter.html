@@ -1,0 +1,25 @@
+<html>
+    <body><h2>Report Menu</h2><br>
+
+        <h3>Facility Inventory Report</h3>
+        <form action="{{url_for('facility_inventory_report')}}" method="POST"><br>
+            Facility Name<br>
+            <select name="facility">
+
+              {% for o in facilities_data %}
+                <option value="{{ o.c }}">{{ o.c }}</option>
+              {% endfor %}
+
+            </select><br><br>
+            Date<br>
+            <input type="date" name="date"><br>
+            <br><br>
+            <button type="submit" class="btn btn-default" >Inventory Report</button>
+        </form>
+
+        <a href="{{url_for('in_transit_report')}}">In Transit Report</a><br><br>
+        <a href="{{url_for('logout')}}">Logout</a>
+
+    </body>
+</html>
+ 

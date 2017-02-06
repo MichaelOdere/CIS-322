@@ -1,0 +1,23 @@
+<html>
+    <body><h2>In Transit Report</h2>
+        <table border="3">
+            <tr>
+                <th>Asset Tag</th>
+                <th>Departure Time</th>
+                <th>Destination Facility</th>
+                <th>Arrival Time</th>
+            </tr>
+            {% for entry in transit_data %}
+                <tr>
+                    <td>{{ entry.asset_tag }}</td>
+                    <td>{{ entry.depart_dt }}</td>
+                    <td>{{ entry.dest_cn }}</td>
+                    <td>{{ entry.arrive_dt }}</td>
+                </tr>
+            {% endfor %}
+        </table>
+        <br><br>
+        <a href="{{url_for('report_filter')}}">Reports</a><br><br>
+        <a href="{{url_for('logout')}}">Logout</a><br><br>
+    </body>
+</html>
