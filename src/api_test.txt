@@ -1,11 +1,6 @@
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={"timestamp":"2017-02-02 06:15:13"}' http://localhost:8080/rest/lost_key
-
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={"timestamp":"2017-02-02 06:15:13", "username":"carter"}' http://localhost:8080/rest/activate_user
-
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={"timestamp":"2017-02-02 06:15:13", "username":"carter"}' http://localhost:8080/rest/suspend_user
-
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={"timestamp": "2017-02-02 06:15:13","vendor": "","description": "notepad","compartments": []}' http://localhost:8080/rest/list_products
-
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={{"timestamp": "2017-02-02 06:15:13","new_products": [{"vendor": "Dunder Mifflin","description": "LOST letter size notepad","alt_description": "Children’s storybook""compartments": ["adm:s"]},{"vendor": "Stark Industries","description": "Micronized Arc Reactor","alt_description": "Baseball""compartments": ["nrg:ts","wpn:s"]}}' http://localhost:8080/rest/add_products
-
 curl -i -H "Content-Type: application/x-www-form-urlencoded" -X POST -d 'arguments={"timestamp": "2017-02-02 06:15:13","vendor": "Dunder Mifflin","description": "LOST letter size notepad","compartments": ["wpn:ts"],"facility": "HQ"}' http://localhost:8080/rest/add_asset
