@@ -13,13 +13,8 @@ if [ "$#" -ne 1 ]; then
         exit;
 fi
 
-cd sql
-psql $1 create_tables.sql
-curl -O https://classes.cs.uoregon.edu//17W/cis322/files/osnap_legacy.tar.gz
-tar -xzf osnap_legacy.tar.gz
-bash ./import_data.sh $1 5432
-rm -rf osnap_legacy osnap_legacy.tar.gz
-cd ..
+# Create tables in db
+psql $1 -f sql/create_tables.sql
 
 # Install the wsgi files
 cp -R src/* $HOME/wsgi
