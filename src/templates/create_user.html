@@ -1,0 +1,17 @@
+<html>
+    <body>
+	<h1> Create New User </h1>
+	<form action="{{url_for('create_user')}}" method = "POST">
+	    Username:
+            <br>
+	    <input type="text" name="username">
+	    <br>
+	    Password:
+            <br>
+	    <input type="password" name="password">
+	    <br>
+	    <input type="submit" value="Submit">
+	</form>
+	<a href="{{url_for('login')}}">Login</a>
+    </body>
+</html>
