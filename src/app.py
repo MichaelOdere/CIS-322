@@ -16,7 +16,6 @@ def exists(username):
     return (cur.fetchone() is not None)
     
 def valid_username(username, password, role):
-
     if (len(username) <= 16 and len(password) <= 16 and len(role) <= 32):
         cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
         conn.commit()
@@ -65,6 +64,9 @@ def login():
         password = request.form['password']
         if check_password(username,password):
             session['username'] = username
+            cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
+            role = cur.fetchone()
+            session['role'] = role[0]
             return dashboard()
         else:
             return render_template('invalid_login.html')
@@ -153,6 +155,43 @@ def add_asset():
             return redirect(url_for('add_asset'))
 
     return render_template('add_asset.html')
+
+def is_disposed(tag):
+    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
+    cur.execute("SELECT tag FROM assets WHERE tag=%s AND disposed = 't'",[tag])
+    return (cur.fetchone() is not None)
+
+@app.route('/dispose_asset', methods=(['POST','GET']))
+def dispose_asset():
+    if request.method == 'GET':
+            return render_template('dispose_asset.html')
+
+    cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
+    role = cur.fetchone()
+    print ("BELLOW IS ROLE")
+    print (role)
+    if (role[0].lower() != 'logistics officer'):
+        return render_template('unauthorized_access.html')
+
+    if request.method == 'POST':
+        tag  = request.form['tag']
+        date = request.form['date']
+
+        if not asset_exists(tag):
+           return render_template('bad_dispose.html')
+
+        if is_disposed(tag):
+            return render_template('already_disposed.html')
+
+        cur.execute("UPDATE assets SET disposed=%s WHERE tag=%s",(True, tag))
+        conn.commit()
+
+        cur.execute("UPDATE asset_location SET depart=%s WHERE asset_fk=(SELECT asset_pk FROM assets WHERE tag=%s)",(date,tag)) 
+        conn.commit()    
+        return render_template('dashboard.html', username=session['username'])
+        
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=8080)
