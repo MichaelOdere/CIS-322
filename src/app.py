@@ -2,6 +2,7 @@ from flask import Flask, render_template, request
 from config import dbname, dbhost, dbport
 import sys
 import psycopg2
+import json
 
 conn = psycopg2.connect(dbname=dbname, host=dbhost,port=dbport)
 cur = conn.cursor()
@@ -22,6 +23,83 @@ def login():
 @app.route('/logout')
 def logout():
     return render_template('logout.html')
+
+@app.route('/rest')
+def rest():
+    return render_template('rest.html')
+
+@app.route('/rest/lost_key', methods=['POST'])
+def lost_key():
+    if request.method == 'POST' and 'arguments' in request.form:
+        req = json.loads(request.form['arguments'])
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    dat['key'] = "bksaoudu......aoelchsauh"
+    return json.dumps(dat)
+
+@app.route('/rest/activate_user', methods=('POST',))
+def activate_user():
+    # Try to handle as plaintext
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+
+    # parse data out, return timestamp, and result
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    data = json.dumps(dat)
+    return data
+
+@app.route('/rest/suspend_user', methods=['POST'])
+def suspend_user():
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    return  json.dumps(dat)
+
+@app.route('/rest/list_products', methods=['POST'])
+def list_products():
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    cur = conn.cursor()
+    cur.execute("SELECT vendor, description FROM products WHERE description = %s", [req['description']]);
+    res = cur.fetchall()
+
+    lis = []
+    for r in res:
+        products_data = dict()
+        print (r)
+        products_data['vendor'] = r[0]
+        products_data['description'] = r[1]
+        products_data['compartments'] = []
+        lis.append(products_data)
+    dat['listing'] = lis
+    return json.dumps(dat)
+
+@app.route('/rest/add_products', methods=['POST'])
+def add_products():
+    if request.method == 'POST' and 'arguments' in request.form:
+        req = json.loads(request.form['arguments'])
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    dat['key'] = "bksaoudu......aoelchsauh"
+    return json.dumps(dat)
+
+@app.route('/rest/add_asset', methods=['POST'])
+def add_asset():
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+    dat = dict()
+    dat['timestamp'] = req['timestamp']
+    dat['result'] = 'OK'
+    return json.dumps(dat)
 
 @app.route('/report_filter')
 def report_filter():
