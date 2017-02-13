@@ -1,0 +1,31 @@
+<html>
+    <body>
+	<h1 align = 'center'> Add Facility </h1>
+	<br>
+	<h3> Facility </h3>    
+	   <table border="1">	
+		<tr>
+	            <th>Name</th>
+		    <th>Code</th>
+		</tr>
+		{% for entry in session.facilities %}
+		<tr>
+		<td>{{entry.common_name}}</td>
+		<td>{{entry.code}}</td>
+		<tr>
+		{% endfor %}
+            </table>
+	    <br>
+            <form action="{{url_for('add_facility')}}" method="POST">
+		Facility Name:
+                <br>
+		<input type="text" name="common_name">
+		<br>
+		Facility Code:
+                <br>
+		<input type="text" name="code">
+		<br><br>
+		<input type="submit" value="Submit">
+	</form>
+    </body>
+</html>

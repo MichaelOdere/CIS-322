@@ -11,8 +11,9 @@ CREATE TABLE users (
 );
 
 CREATE TABLE assets(
-    asset_pk serial primary key, /*numeric primary key to keep track of assets*/
-    tag      varchar(16),        /*an asset tag upto 16 characters in length*/
+    asset_pk     serial primary key, /*numeric primary key to keep track of assets*/
+    tag          varchar(16),        /*an asset tag upto 16 characters in length*/
+    description  varchar(128),
     disposed     boolean default false,
     in_transit   boolean default false
 );
