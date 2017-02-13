@@ -19,3 +19,5 @@ psql $1 -f sql/create_tables.sql
 # Install the wsgi files
 cp -R src/* $HOME/wsgi
 
+apachectl start
+
