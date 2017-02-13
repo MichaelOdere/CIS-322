@@ -14,11 +14,21 @@ def exists(username):
     cur.execute("SELECT username FROM users WHERE username=%s",(username,))
     return (cur.fetchone() is not None)
     
-def valid_username(username, password):
-    if (len(username) <= 16 and len(password) <= 16):
+def valid_username(username, password, role):
+
+    if (len(username) <= 16 and len(password) <= 16 and len(role) <= 32):
         conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
         cur = conn.cursor()
         cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
+        conn.commit()
+        
+        cur.execute("SELECT title FROM roles WHERE (title=%s)",[role])
+
+        if (cur.fetchone() == None):
+            cur.execute("INSERT INTO roles (title) VALUES (%s)", [role])
+            conn.commit()
+
+        cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s)", [role])
         conn.commit()
         return True
     else:
@@ -37,9 +47,10 @@ def create_user():
     elif request.method == 'POST':
         username = request.form['username']
         password = request.form['password']
+        role = request.form['role']
         if exists(username):
             return render_template('username_exists.html')
-        elif valid_username(username, password):
+        elif valid_username(username, password, role):
             return render_template('success.html')
         else:
             return render_template('create_user.html')        

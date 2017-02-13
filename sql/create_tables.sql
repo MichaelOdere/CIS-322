@@ -1,17 +1,18 @@
-CREATE TABLE users (
-    user_pk  serial primary key, /* numeric primary key to keep track of each user */
-    username varchar(16),        /* max 16 characters long  */
-    password varchar(16)         /* max 16 characters long  */
-);
-
 CREATE TABLE roles (
     role_pk serial primary key, /* numeric primary key to keep track of users*/
     title   varchar(128)        /* title of the role */
 );
 
+CREATE TABLE users (
+    user_pk  serial primary key,               /* numeric primary key to keep track of each user */
+    role_fk  int REFERENCES roles (role_pk),   /*references role_pk in roles*/
+    username varchar(16),                      /* max 16 characters long  */
+    password varchar(16)                       /* max 16 characters long  */
+);
+
 CREATE TABLE assets(
     asset_pk serial primary key, /*numeric primary key to keep track of assets*/
-    tag      varchar(16)         /*an asset tag upto 16 characters in length*/
+    tag      varchar(16),        /*an asset tag upto 16 characters in length*/
     disposed     boolean default false,
     in_transit   boolean default false
 );
@@ -26,5 +27,5 @@ CREATE TABLE asset_location(
     asset_fk    int REFERENCES assets (asset_pk) default null,        /*references asset_pk in assets*/
     facility_fk int REFERENCES facilities (facility_pk) default null, /*references facility_pk in facilities*/
     arrive      date default null,                                    /*date arived*/
-    depart      date default null,                                    /*date departed*/
+    depart      date default null                                     /*date departed*/
 );
