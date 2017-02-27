@@ -190,37 +190,35 @@ def dispose_asset():
         cur.execute("UPDATE asset_location SET depart=%s WHERE asset_fk=(SELECT asset_pk FROM assets WHERE tag=%s)",(date,tag)) 
         conn.commit()    
         return render_template('dashboard.html', username=session['username'])
-        
 
-def facility_exists(name):
+
+
+def facility_name_exists(name):
+    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
     cur.execute("SELECT facility_pk FROM facilities WHERE common_name=%s",[name])
     return (cur.fetchone() is not None)
 
 @app.route('/asset_report', methods=(['POST', 'GET']))
 def asset_report():
-
+    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    cur = conn.cursor()
     if request.method == 'POST':
         facility = request.form['facility']
         date = request.form['report_date']
-
-        stmt_select = "SELECT a.asset_tag, a.description, f.common_name, aa.arrival, aa.departure"
-        stmt_from = "FROM assets AS a, facilities AS f, asset_at AS aa WHERE"
-        stmt_where = "(a.asset_pk=aa.asset_fk AND f.facility_pk=aa.facility_fk AND f.common_name=%s AND aa.arrival<=%s)", (facility,date)
-        
-        if (facility_exists(facility)):
-            stmt = stmt_select+stmt_from+stmt_where
-            cur.execute(stmt)
+        if (facility == ' '):
+            cur.execute("SELECT assets.tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa")             
+        elif (facility_name_exists(facility)):
+            cur.execute("SELECT assets.tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa WHERE (assets.asset_pk=aa.asset_fk AND facilities.facility_pk=aa.facility_fk AND facilities.common_name=%s AND aa.arrive<=%s)",(facility,date))
         else:
-            stmt_where = "(a.asset_pk=aa.asset_fk AND f.facility_pk=aa.facility_fk AND aa.arrival<=%s)",[date])
-            stmt = stmt_select+stmt_from+stmt_where
-            cur.execute(stmt)
+            cur.execute("SELECT assets.tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa WHERE (assets.asset_pk=aa.asset_fk AND facilities.facility_pk=aa.facility_fk AND aa.arrive<=%s)",[date])        
 
         values = cur.fetchall()
-        return render_template('asset_report.html', rows=values)
+        return render_template('asset_report.html', rows=values)        
 
     return render_template('asset_report.html')
 
 
-
+        
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=8080)
