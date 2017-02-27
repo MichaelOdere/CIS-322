@@ -1,0 +1,33 @@
+<html>
+    <body>
+	<h1 align = "center">Asset Report</h1>
+        <br>
+        <form action="{{url_for('asset_report')}}" method="POST">
+  	    	Facility:<br>
+			    <input type="text" name="facility">
+			    <br>
+			    Date:<br>
+			    <input type="date" name="report_date" value='1900-01-01'>
+			    <br>  
+			    <input type="submit" value="Submit">
+				</form>
+        <table border="2">
+ 					<tr>
+		          <th>Facility</th>
+					    <th>Asset Tag</th>
+					    <th>Description</th>
+					    <th>Arrival</th>
+					    <th>Departure</th>
+					</tr>
+					{% for row in rows %}
+					<tr>
+					    <td>{{row[0]}}</td>
+					    <td>{{row[1]}}</td>
+					    <td>{{row[2]}}</td>
+					    <td>{{row[3]}}</td>
+					    <td>{{row[4]}}</td>
+					</tr>
+					{% endfor %}
+					</table>
+    </body>
+</html>

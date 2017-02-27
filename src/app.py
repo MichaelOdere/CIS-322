@@ -192,6 +192,35 @@ def dispose_asset():
         return render_template('dashboard.html', username=session['username'])
         
 
+def facility_exists(name):
+    cur.execute("SELECT facility_pk FROM facilities WHERE common_name=%s",[name])
+    return (cur.fetchone() is not None)
+
+@app.route('/asset_report', methods=(['POST', 'GET']))
+def asset_report():
+
+    if request.method == 'POST':
+        facility = request.form['facility']
+        date = request.form['report_date']
+
+        stmt_select = "SELECT a.asset_tag, a.description, f.common_name, aa.arrival, aa.departure"
+        stmt_from = "FROM assets AS a, facilities AS f, asset_at AS aa WHERE"
+        stmt_where = "(a.asset_pk=aa.asset_fk AND f.facility_pk=aa.facility_fk AND f.common_name=%s AND aa.arrival<=%s)", (facility,date)
+        
+        if (facility_exists(facility)):
+            stmt = stmt_select+stmt_from+stmt_where
+            cur.execute(stmt)
+        else:
+            stmt_where = "(a.asset_pk=aa.asset_fk AND f.facility_pk=aa.facility_fk AND aa.arrival<=%s)",[date])
+            stmt = stmt_select+stmt_from+stmt_where
+            cur.execute(stmt)
+
+        values = cur.fetchall()
+        return render_template('asset_report.html', rows=values)
+
+    return render_template('asset_report.html')
+
+
 
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=8080)
