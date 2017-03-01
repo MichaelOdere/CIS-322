@@ -16,7 +16,7 @@
                     <th>Asset</th>
 	   	    <th>Description</th>
 		</tr>
-	        {% for task in session.work %}
+	        {% for task in session.dashboard %}
                 <tr>
                     <td><a href="{{url_for('update_transit')}}?request_pk={{task.request_pk}}&transit_tag={{task.asset_tag}}">{{task.asset_tag}}</td>
 		    <td>{{task.description}}</td>
@@ -32,7 +32,7 @@
     	        <th>Asset</th>
 		<th>Destination Facility</th>
 	    </tr>
-	    {% for task in session.work %}
+	    {% for task in session.dashboard %}
 	        <tr>
 	            <td><a href="{{url_for('approve_req')}}?transfer_pk={{task.transfer_pk}}&approval_tag={{task.asset_tag}}">{{task.asset_tag}}</a></td>
 	   	    <td>{{task.destination_facility}}</td>

@@ -26,7 +26,8 @@ def valid_username(username, password, role):
             cur.execute("INSERT INTO roles (title) VALUES (%s)", [role])
             conn.commit()
 
-        cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s)", [role])
+        cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s) WHERE username=%s", (role,username))
+
         conn.commit()
         return True
     else:
@@ -68,7 +69,6 @@ def login():
             session['username'] = username
             cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
             role = cur.fetchone()
-            print ("HERE IS ROL!!!!!!!!!!!!!!!!!!!!!!", role);
             session['role'] = role[0]
             return dashboard()
         else:
@@ -76,6 +76,31 @@ def login():
 
 @app.route('/dashboard', methods = ['GET'])
 def dashboard():
+
+    values = []
+    role = session['role']
+    if role.lower() == 'logistics officer':
+        cur.execute("SELECT a.description, a.tag, t.requester_fk FROM assets AS a, transfers AS t WHERE (a.asset_pk=t.asset_fk AND t.approved_dt is not null AND (t.load_dt is null OR t.unload_dt is null))")
+        results = cur.fetchall()
+        if results != None:
+            for r in results: 
+                row = dict()
+                row['description'] = r[0]
+                row['asset_tag'] = r[1]
+                row['request_pk'] = r[2]
+                values.append(row)
+            session['dashboard'] = values
+    if role.lower() == 'facilities officer':
+        cur.execute("SELECT a.tag, f.common_name, t.requester_fk FROM assets AS a, transfers AS t, facilities AS f WHERE f.facility_pk=t.dest_fk AND a.asset_pk=t.asset_fk AND t.approver_fk is null")
+        results = cur.fetchall()
+        if results != None:
+            for r in results:
+                row = dict()
+                row['destination_facility'] = r[1]
+                row['transfer_pk'] = r[2]
+                row['asset_tag'] = r[0]
+                values.append(row)
+            session['dashboard'] = values
     return render_template('dashboard.html', username = session['username'])
 
 def facility_exists(name, code):
@@ -172,8 +197,6 @@ def dispose_asset():
 
     cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
     role = cur.fetchone()
-    print ("BELLOW IS ROLE")
-    print (role)
     if (role[0].lower() != 'logistics officer'):
         return render_template('unauthorized_access.html')
 
@@ -287,11 +310,11 @@ def approve_req():
         cur.execute("SELECT asset_fk FROM transfers WHERE transfer_pk = %s", (transfer_pk))
         asset_fk = cur.fetchone()
 
-        if(asset_fk is None):
-            return render_template('general_error.html', general_error='No such transfer_pk')
+        #if(asset_fk is None):
+        #    return render_template('general_error.html', general_error='No such transfer_pk')
 
-        if(asset_fk != approval_tag):
-            return render_template('general_error.html', general_error='transfer does not contain that asset')
+        #if(asset_fk != approval_tag):
+        #    return render_template('general_error.html', general_error='transfer does not contain that asset')
 
         return render_template('approve_req.html', transfer_pk=transfer_pk, approval_tag=approval_tag)
 
@@ -299,11 +322,11 @@ def approve_req():
         transfer_pk = request.form['transfer_pk']
 
         if request.form.get('approve'):
-            cur.execute("UPDATE transfers SET approver_fk=(SELECT user_pk FROM users WHERE username=%s), approval_time=CURRENT_TIMESTAMP WHERE (request_pk=CAST(%s as integer))", (session['username'], transfer_pk))
+            cur.execute("UPDATE transfers SET approver_fk=(SELECT user_pk FROM users WHERE username=%s), approved_dt=CURRENT_TIMESTAMP WHERE (requester_fk=CAST(%s as integer))", (session['username'], transfer_pk))
             conn.commit()
 
         if request.form.get('reject'):
-            cur.execute("DELETE FROM transfers WHERE (transfers_pk=CAST(%s as integer))",[transfer_pk])
+            cur.execute("DELETE FROM transfers WHERE (transfer_pk=CAST(%s as integer))",[transfer_pk])
             conn.commit()
 		
     return redirect(url_for('dashboard'))
@@ -316,13 +339,12 @@ def update_transit():
 
     if request.method == 'GET':
         transfer_pk = request.args['transfer_pk']
-        transit_tag = request.args['transit_tag']
-        return render_template('update_transit.html', transfer_pk=transfer_pk, transit_tag=transit_tag)
+        asset_tag = request.args['asset_tag']
+        return render_template('update_transit.html', transfer_pk=transfer_pk, asset_tag=asset_tag)
 
     if request.method == 'POST':
         transfer_pk = request.form['transfer_pk']
         cur.execute("SELECT unload_dt FROM transfers WHERE transfer_pk=CAST(%s as integer)", [transfer_pk])
-        transit = cur.fetchone()
         
         load_dt = request.form['load_dt']
         if (load_dt != None or load_dt != ' '):
