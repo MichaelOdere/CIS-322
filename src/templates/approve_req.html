@@ -1,0 +1,12 @@
+<html>
+    <body>
+      <h2>Approve Requests</h2>
+        <form action="{{url_for('approve_req')}}" method="POST">
+          <input type="hidden" name="transfer_pk" value="{{transfer_pk}}">
+          <input type="submit" name="approve" value="Approve" />
+          <br>
+          <br>
+          <input type="submit" name="reject" value="Reject" />
+        </form>
+    </body>
+</html>

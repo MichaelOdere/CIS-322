@@ -47,6 +47,8 @@ def create_user():
         if exists(username):
             return render_template('username_exists.html')
         elif valid_username(username, password, role):
+            session['username'] = username
+            session['role'] = role
             return render_template('success.html')
         else:
             return render_template('create_user.html')        
@@ -66,6 +68,7 @@ def login():
             session['username'] = username
             cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
             role = cur.fetchone()
+            print ("HERE IS ROL!!!!!!!!!!!!!!!!!!!!!!", role);
             session['role'] = role[0]
             return dashboard()
         else:
@@ -194,15 +197,15 @@ def dispose_asset():
 
 
 def facility_name_exists(name):
-    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-    cur = conn.cursor()
+    #conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    #cur = conn.cursor()
     cur.execute("SELECT facility_pk FROM facilities WHERE common_name=%s",[name])
     return (cur.fetchone() is not None)
 
 @app.route('/asset_report', methods=(['POST', 'GET']))
 def asset_report():
-    conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
-    cur = conn.cursor()
+    #conn = psycopg2.connect(dbname=dbname, host=dbhost, port=dbport)
+    #cur = conn.cursor()
     if request.method == 'POST':
         facility = request.form['facility']
         date = request.form['report_date']
@@ -218,7 +221,122 @@ def asset_report():
 
     return render_template('asset_report.html')
 
+@app.route('/transfer_req', methods=(['POST', 'GET']))
+def transfer_req():
 
+    if session['role'].lower() != 'logistics officer':
+        return render_template('unauthorized_access.html')
+   
+    if request.method == 'GET':
+        cur.execute("SELECT tag FROM assets WHERE disposed = 'f'")
+        temp  = cur.fetchall()
+        assets = []
         
+        for asset in temp:
+            assets.append(asset[0])
+        cur.execute("SELECT common_name FROM facilities")
+        temp  = cur.fetchall()
+        facilities = []
+
+        for fac in temp:
+            facilities.append(fac[0])
+
+        return render_template('transfer_req.html', assets=assets, facilities=facilities)
+    
+    if request.method == 'POST':
+        asset = request.form['asset_to_transfer']
+        facility = request.form['facility_to_transfer']
+
+        cur.execute("SELECT user_pk FROM users WHERE username = %s", (session['username'],))
+        requester = cur.fetchone()
+
+        cur.execute("SELECT asset_pk FROM assets WHERE tag = %s", [asset])
+        asset_fk = cur.fetchone()
+
+        if(asset_fk is None):
+            return render_template('general_error.html', general_error='No such asset')
+
+        cur.execute("SELECT facility_pk FROM facilities WHERE common_name = %s", [facility])
+        dest_facility = cur.fetchone()
+
+        if(dest_facility is None):
+            return render_template('general_error.html', general_error='No such facility')
+
+        cur.execute("SELECT facility_fk FROM asset_location WHERE asset_fk = %s", [asset])
+        src_facility = cur.fetchone()
+
+        cur.execute("INSERT INTO transfers (requester_fk, asset_fk, src_fk, dest_fk, request_dt) VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)", (requester, asset_fk, src_facility, dest_facility))
+
+        conn.commit()
+
+        return redirect(url_for('transfer_request_success'))
+
+@app.route('/transfer_request_success')
+def transfer_request_success():
+    return render_template('transfer_request_success.html')
+
+@app.route('/approve_req', methods=('GET', 'POST'))
+def approve_req():
+    if session['role'].lower() != 'facilities officer':
+        return render_template('unauthorized_access.html')
+
+    if request.method == 'GET':
+        transfer_pk = request.args['transfer_pk']
+        approval_tag = request.args['approval_tag']
+
+        cur.execute("SELECT asset_fk FROM transfers WHERE transfer_pk = %s", (transfer_pk))
+        asset_fk = cur.fetchone()
+
+        if(asset_fk is None):
+            return render_template('general_error.html', general_error='No such transfer_pk')
+
+        if(asset_fk != approval_tag):
+            return render_template('general_error.html', general_error='transfer does not contain that asset')
+
+        return render_template('approve_req.html', transfer_pk=transfer_pk, approval_tag=approval_tag)
+
+    if request.method == 'POST':
+        transfer_pk = request.form['transfer_pk']
+
+        if request.form.get('approve'):
+            cur.execute("UPDATE transfers SET approver_fk=(SELECT user_pk FROM users WHERE username=%s), approval_time=CURRENT_TIMESTAMP WHERE (request_pk=CAST(%s as integer))", (session['username'], transfer_pk))
+            conn.commit()
+
+        if request.form.get('reject'):
+            cur.execute("DELETE FROM transfers WHERE (transfers_pk=CAST(%s as integer))",[transfer_pk])
+            conn.commit()
+		
+    return redirect(url_for('dashboard'))
+
+@app.route('/update_transit', methods=('GET', 'POST'))
+def update_transit():
+
+    if session['role'].lower() != 'logistics officer':
+        return render_template('general_error.html', general_error='No such must be logistics officer to in order to update transit data')
+
+    if request.method == 'GET':
+        transfer_pk = request.args['transfer_pk']
+        transit_tag = request.args['transit_tag']
+        return render_template('update_transit.html', transfer_pk=transfer_pk, transit_tag=transit_tag)
+
+    if request.method == 'POST':
+        transfer_pk = request.form['transfer_pk']
+        cur.execute("SELECT unload_dt FROM transfers WHERE transfer_pk=CAST(%s as integer)", [transfer_pk])
+        transit = cur.fetchone()
+        
+        load_dt = request.form['load_dt']
+        if (load_dt != None or load_dt != ' '):
+            cur.execute("UPDATE transfers SET load_dt=%s WHERE transfer_pk=CAST(%s as integer)", (load_dt, transfer_pk))
+        
+        unload_dt = request.form['unload_dt']
+        if (unload_dt != None or unload_dt != ' ' ):
+            cur.execute("UPDATE transfers SET unload_dt=%s WHERE transfer_pk=CAST(%s as integer)", (unload_dt, transfer_pk))
+
+        conn.commit()
+
+        return redirect(url_for('dashboard'))
+
+
 if __name__ == "__main__":
     app.run(host='0.0.0.0',port=8080)
+

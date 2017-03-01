@@ -1,0 +1,25 @@
+<html>
+  <body><h2>Transfer Request</h2>
+    <br>
+    <form action="{{url_for('transfer_req')}}" method="POST">
+      Asset
+      <br>
+      <select name="asset_to_transfer">
+      {% for asset in assets %}
+        <option value="{{asset}}">{{asset}}</option>
+      {% endfor %}
+      </select>
+      <br>
+      <br>
+      Destination Facility
+      <br>
+      <select name="facility_to_transfer">
+      {% for facility in facilities %}
+        <option value="{{facility}}">{{facility}}</option>
+      {% endfor %}
+      </select>
+      <br>
+      <input type="submit" name="submit" value="Submit Request" />
+    </form>
+  </body>
+</html>

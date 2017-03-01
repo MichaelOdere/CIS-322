@@ -1,5 +1,44 @@
 <html>
-	<body>
-		<h1> Welcome {{ username }} to your dashboard.</h1>
-	</body>
+    <body>
+        <h3>Welcome {{ session.username }} to your dashboard.</h3>
+        <a href="{{url_for('asset_report')}}">Asset Report</a><br>
+        <a href="{{url_for('add_asset')}}">Add Asset</a><br>
+        <a href="{{url_for('add_facility')}}">Add Facility</a><br>
+        {% if session.role.lower() == 'logistics officer' %}
+            <a href="{{url_for('dispose_asset')}}">Dispose Asset</a><br>
+            <a href="{{url_for('transfer_req')}}">Transfer Request</a><br>
+        {% endif %}
+        <br>
+        {% if session.role.lower() == 'logistics officer' %}
+            Transits needing load or unload times:<br><br>
+            <table border="2">
+                <tr>
+                    <th>Asset</th>
+	   	    <th>Description</th>
+		</tr>
+	        {% for task in session.work %}
+                <tr>
+                    <td><a href="{{url_for('update_transit')}}?request_pk={{task.request_pk}}&transit_tag={{task.asset_tag}}">{{task.asset_tag}}</td>
+		    <td>{{task.description}}</td>
+	        </tr>
+	        {% endfor %}
+	    </table>
+	{% endif %}
+        <br>
+	{% if session.role.lower() == 'facilities officer' %}
+            Transfer Requests to Approve:<br><br>
+            <table border="2">
+            <tr> 
+    	        <th>Asset</th>
+		<th>Destination Facility</th>
+	    </tr>
+	    {% for task in session.work %}
+	        <tr>
+	            <td><a href="{{url_for('approve_req')}}?transfer_pk={{task.transfer_pk}}&approval_tag={{task.asset_tag}}">{{task.asset_tag}}</a></td>
+	   	    <td>{{task.destination_facility}}</td>
+		</tr>
+	    {% endfor %}
+	    </table>
+        {% endif %}
+    </body>
 </html>

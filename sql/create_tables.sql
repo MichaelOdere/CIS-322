@@ -30,3 +30,17 @@ CREATE TABLE asset_location(
     arrive      date default null,                                    /*date arived*/
     depart      date default null                                     /*date departed*/
 );
+
+CREATE TABLE transfers(
+    transfer_pk  serial primary key, /*numeric key to keep track of transfers*/
+    requester_fk int REFERENCES users (user_pk) default null, /*references the user_pk for who initiated transfer*/
+    approver_fk  int REFERENCES users (user_pk) default null, /*references the user_pk for who approved the transfer*/
+    asset_fk     int REFERENCES assets (asset_pk) default null, /*references the asset to be transfered */
+    src_fk       int REFERENCES facilities (facility_pk) default null, /*references facility_pk the transfer was initiated from */    
+    dest_fk      int REFERENCES facilities (facility_pk) default null, /*references facility_pk the transfer was sent to */
+    request_dt   timestamp default null, /*time the request for the transfer was made*/
+    approved_dt  timestamp default null, /*time the request for the transfer was approved*/
+    load_dt      timestamp default null, /*time asset was loaded*/
+    unload_dt    timestamp default null  /*time assed was unloaded*/
+    
+);
