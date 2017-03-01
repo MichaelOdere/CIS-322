@@ -314,8 +314,6 @@ def approve_req():
             conn.commit()
 
         if request.form.get('reject'):
-            print ("Reject")
-            print ("transfer pk ", transfer_pk)
             cur.execute("DELETE FROM transfers WHERE (transfer_pk=CAST(%s as integer))",[transfer_pk])
             conn.commit()
 
@@ -327,7 +325,6 @@ def update_transit():
     if session['role'].lower() != 'logistics officer':
         return render_template('general_error.html', general_error='No such must be logistics officer to in order to update transit data')
 
-        print ("WE MADE IT HEREEEEEEEE")
         transfer_pk = request.args['transfer_pk']
         asset_tag = request.args['asset_tag']
 
