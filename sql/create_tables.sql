@@ -7,7 +7,8 @@ CREATE TABLE users (
     user_pk  serial primary key,               /* numeric primary key to keep track of each user */
     role_fk  int REFERENCES roles (role_pk),   /*references role_pk in roles*/
     username varchar(16),                      /* max 16 characters long  */
-    password varchar(16)                       /* max 16 characters long  */
+    password varchar(16),                      /* max 16 characters long  */
+    active boolean default true                /* keep track if user is active */
 );
 
 CREATE TABLE assets(
