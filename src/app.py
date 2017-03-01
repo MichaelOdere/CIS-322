@@ -229,12 +229,11 @@ def asset_report():
     if request.method == 'POST':
         facility = request.form['facility']
         date = request.form['report_date']
-        if (facility == ' '):
-            cur.execute("SELECT assets.asset_tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa")
-        elif (facility_name_exists(facility)):
-            cur.execute("SELECT assets.asset_tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa WHERE (assets.asset_pk=aa.asset_fk AND facilities.facility_pk=aa.facility_fk AND facilities.common_name=%s AND aa.arrive<=%s)",(facility,date))
+
+        if (facility_name_exists(facility)):
+            cur.execute("SELECT a.asset_tag, a.description, f.common_name, al.arrive, al.depart FROM assets AS a, facilities AS f, asset_location AS al WHERE (a.asset_pk=al.asset_fk AND f.facility_pk=al.facility_fk AND f.common_name=%s AND al.arrive<=%s)",(facility,date))
         else:
-            cur.execute("SELECT assets.asset_tag, assets.description, facilities.common_name, aa.arrive, aa.depart FROM assets, facilities, asset_location AS aa WHERE (assets.asset_pk=aa.asset_fk AND facilities.facility_pk=aa.facility_fk AND aa.arrive<=%s)",[date])
+            cur.execute("SELECT a.asset_tag, a.description, f.common_name, al.arrive, al.depart FROM assets AS a, facilities AS f, asset_location AS al WHERE (a.asset_pk=al.asset_fk AND f.facility_pk=al.facility_fk AND al.arrive<=%s)",[date])        
 
         values = cur.fetchall()
         return render_template('asset_report.html', rows=values)
@@ -328,6 +327,11 @@ def update_transit():
         transfer_pk = request.args['transfer_pk']
         asset_tag = request.args['asset_tag']
 
+        return render_template('update_transit.html', transfer_pk=transfer_pk, asset_tag=asset_tag)
+    
+    if request.method == 'GET':
+        transfer_pk = request.args['transfer_pk']
+        asset_tag = request.args['asset_tag']
         return render_template('update_transit.html', transfer_pk=transfer_pk, asset_tag=asset_tag)
 
     if request.method == 'POST':
