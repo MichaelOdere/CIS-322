@@ -10,7 +10,6 @@ password = "log"
 role = "logistics officer"
 
 cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
-conn.commit()
 
 cur.execute("SELECT title FROM roles WHERE (title=%s)",[role])
 
@@ -19,7 +18,20 @@ if (cur.fetchone() is None):
     conn.commit()
     
 cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s) WHERE username=%s", (role,username))
-conn.commit()
+
+username = "fac"
+password = "fac"
+role = "facilities officer"
+
+cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
+
+cur.execute("SELECT title FROM roles WHERE (title=%s)",[role])
+
+if (cur.fetchone() is None):
+    cur.execute("INSERT INTO roles (title) VALUES (%s)", [role])
+    conn.commit()
+
+cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s) WHERE username=%s", (role,username))
 
 name = 'oregon'
 code = 1
@@ -29,19 +41,19 @@ name = 'cali'
 code = 2
 cur.execute("INSERT INTO facilities (common_name, facility_code) VALUES (%s,%s)",(name,code))
 
-tag = 1
+tag = "1"
 description = 'lol'
 facility = 2
 arrive = datetime.datetime.now()
 cur.execute("INSERT INTO assets (tag, description) VALUES (%s, %s)", (tag, description))
-cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=CAST(%s as integer)),(SELECT facility_pk FROM facilities  WHERE common_name=%s),%s)",(tag, facility, arrive))
+cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='oregon'),%s)",(tag, arrive))
 
-tag = 2
+tag ="2"
 description = 'fake'
 facility = 2
 arrive = datetime.datetime.now()
 cur.execute("INSERT INTO assets (tag, description) VALUES (%s, %s)", (tag, description))
-cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=CAST(%s as integer)),(SELECT facility_pk FROM facilities  WHERE common_name=%s),%s)",(tag, facility, arrive))
+cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='cali'),%s)",(tag,  arrive))
 
 conn.commit()
 

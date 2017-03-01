@@ -80,25 +80,25 @@ def dashboard():
     values = []
     role = session['role']
     if role.lower() == 'logistics officer':
-        cur.execute("SELECT a.description, a.tag, t.requester_fk FROM assets AS a, transfers AS t WHERE (a.asset_pk=t.asset_fk AND t.approved_dt is not null AND (t.load_dt is null OR t.unload_dt is null))")
+        cur.execute("SELECT a.description, a.tag, t.transfer_pk FROM assets AS a, transfers AS t WHERE (a.asset_pk=t.asset_fk AND t.approved_dt is not null AND (t.load_dt is null OR t.unload_dt is null))")
         results = cur.fetchall()
         if results != None:
             for r in results: 
                 row = dict()
                 row['description'] = r[0]
-                row['asset_tag'] = r[1]
-                row['request_pk'] = r[2]
+                row['tag'] = r[1]
+                row['transfer_pk'] = r[2]
                 values.append(row)
             session['dashboard'] = values
     if role.lower() == 'facilities officer':
-        cur.execute("SELECT a.tag, f.common_name, t.requester_fk FROM assets AS a, transfers AS t, facilities AS f WHERE f.facility_pk=t.dest_fk AND a.asset_pk=t.asset_fk AND t.approver_fk is null")
+        cur.execute("SELECT a.tag, f.common_name, t.transfer_pk FROM assets AS a, transfers AS t, facilities AS f WHERE f.facility_pk=t.dest_fk AND a.asset_pk=t.asset_fk AND t.approver_fk is null")
         results = cur.fetchall()
         if results != None:
             for r in results:
                 row = dict()
                 row['destination_facility'] = r[1]
                 row['transfer_pk'] = r[2]
-                row['asset_tag'] = r[0]
+                row['tag'] = r[0]
                 values.append(row)
             session['dashboard'] = values
     return render_template('dashboard.html', username = session['username'])
@@ -285,9 +285,9 @@ def transfer_req():
         if(dest_facility is None):
             return render_template('general_error.html', general_error='No such facility')
 
-        cur.execute("SELECT facility_fk FROM asset_location WHERE asset_fk = %s", [asset])
+        cur.execute("SELECT facility_fk FROM asset_location WHERE asset_fk = %s", [asset_fk])
         src_facility = cur.fetchone()
-
+        
         cur.execute("INSERT INTO transfers (requester_fk, asset_fk, src_fk, dest_fk, request_dt) VALUES (%s, %s, %s, %s, CURRENT_TIMESTAMP)", (requester, asset_fk, src_facility, dest_facility))
 
         conn.commit()
@@ -319,13 +319,15 @@ def approve_req():
         return render_template('approve_req.html', transfer_pk=transfer_pk, approval_tag=approval_tag)
 
     if request.method == 'POST':
-        transfer_pk = request.form['transfer_pk']
+        transfer_pk = int(request.form['transfer_pk'])
 
         if request.form.get('approve'):
-            cur.execute("UPDATE transfers SET approver_fk=(SELECT user_pk FROM users WHERE username=%s), approved_dt=CURRENT_TIMESTAMP WHERE (requester_fk=CAST(%s as integer))", (session['username'], transfer_pk))
+            cur.execute("UPDATE transfers SET approver_fk=(SELECT user_pk FROM users WHERE username=%s), approved_dt=CURRENT_TIMESTAMP WHERE (transfer_pk=CAST(%s as integer))", (session['username'], transfer_pk))
             conn.commit()
 
         if request.form.get('reject'):
+            print ("Reject")
+            print ("transfer pk ", transfer_pk)
             cur.execute("DELETE FROM transfers WHERE (transfer_pk=CAST(%s as integer))",[transfer_pk])
             conn.commit()
 		
@@ -338,9 +340,12 @@ def update_transit():
         return render_template('general_error.html', general_error='No such must be logistics officer to in order to update transit data')
 
     if request.method == 'GET':
+        print ("WE MADE IT HEREEEEEEEE")
         transfer_pk = request.args['transfer_pk']
-        asset_tag = request.args['asset_tag']
-        return render_template('update_transit.html', transfer_pk=transfer_pk, asset_tag=asset_tag)
+        tag = request.args['tag']
+        print ("transfer_pk", transfer_pk)
+        print ("tag", tag)
+        return render_template('update_transit.html', transfer_pk=transfer_pk, tag=tag)
 
     if request.method == 'POST':
         transfer_pk = request.form['transfer_pk']
