@@ -304,15 +304,6 @@ def approve_req():
         transfer_pk = request.args['transfer_pk']
         approval_tag = request.args['approval_tag']
 
-        cur.execute("SELECT asset_fk FROM transfers WHERE transfer_pk = %s", (transfer_pk))
-        asset_fk = cur.fetchone()
-
-        #if(asset_fk is None):
-        #    return render_template('general_error.html', general_error='No such transfer_pk')
-
-        #if(asset_fk != approval_tag):
-        #    return render_template('general_error.html', general_error='transfer does not contain that asset')
-
         return render_template('approve_req.html', transfer_pk=transfer_pk, approval_tag=approval_tag)
 
     if request.method == 'POST':
@@ -336,7 +327,6 @@ def update_transit():
     if session['role'].lower() != 'logistics officer':
         return render_template('general_error.html', general_error='No such must be logistics officer to in order to update transit data')
 
-    if request.method == 'GET':
         print ("WE MADE IT HEREEEEEEEE")
         transfer_pk = request.args['transfer_pk']
         asset_tag = request.args['asset_tag']
