@@ -36,7 +36,7 @@ def valid_username(username, password, role):
 def check_password(username, password):
     cur.execute("SELECT password  FROM users WHERE username=%s AND password = %s",(username,password))
     return (cur.fetchone() is not None)
-
+'''
 @app.route('/create_user', methods = ['POST','GET'])
 def create_user():
     if request.method == 'GET':
@@ -53,7 +53,7 @@ def create_user():
             return render_template('success.html')
         else:
             return render_template('create_user.html')
-
+'''
 @app.route('/')
 def index():
     return render_template('login.html')
@@ -62,14 +62,25 @@ def index():
 def login():
     if request.method == 'GET':
         return render_template('login.html')
-    elif request.method =='POST':
+
+    if request.method =='POST':
         username = request.form['username']
         password = request.form['password']
-        if check_password(username,password):
+
+        cur.execute("SELECT password, role_fk, active FROM users WHERE username=%s", (username,))
+        user = cur.fetchone()
+
+        if user == None:
+            return render_template('invalid_login.html', username=username)
+
+        if user[2] == False:
+            return render_template('unmatched.html', username=username)
+            
+        if user[0] == password:
             session['username'] = username
-            cur.execute("SELECT title FROM roles WHERE role_pk=(SELECT role_fk FROM users WHERE username=%s)",[session['username']])
+            cur.execute("SELECT * FROM roles WHERE role_pk=%s",(user[1],))
             role = cur.fetchone()
-            session['role'] = role[0]
+            session['role'] = role[1]
             return dashboard()
         else:
             return render_template('invalid_login.html')
@@ -349,6 +360,91 @@ def update_transit():
         conn.commit()
 
         return redirect(url_for('dashboard'))
+
+
+@app.route('/activate_user', methods=('POST',))
+def activate_user():
+    
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+
+        if 'username' not in req or 'password' not in req or 'role' not in req:
+            err = dict()
+            err['result'] = 'ERROR! missing values'
+            error = json.dumps(err)
+            return error
+
+        username = req['username']
+        password = req['password']
+        role = req['role']
+
+        if role == 'facofc':
+            role = 'Facilities Officer'
+
+        elif role == 'logofc':
+            role = 'Logistics Officer'
+
+        cur.execute("SELECT * FROM users WHERE username=%s", (username,))
+        user = cur.fetchone()
+
+        if user != None:
+            cur.execute("UPDATE users SET password=%s, active=True WHERE username=%s",(password,username))
+        else:
+
+            cur.execute("INSERT INTO users (username, password) VALUES (%s, %s)",(username, password))
+
+            cur.execute("SELECT title FROM roles WHERE (title=%s)",[role])
+
+            if (cur.fetchone() == None):
+                cur.execute("INSERT INTO roles (title) VALUES (%s)", [role])
+                conn.commit()
+
+            cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s) WHERE username=%s", (role,username))
+
+
+        conn.commit()
+
+        # return result
+        dat = dict()
+        dat['result'] = 'Status code 200 ok'
+        data = json.dumps(dat)
+        return data
+
+@app.route('/revoke_user', methods=('POST',))
+def revoke_user():
+    
+    if request.method=='POST' and 'arguments' in request.form:
+        req=json.loads(request.form['arguments'])
+
+    if 'username' not in req:
+        dat = dict()
+        err['result'] = 'ERROR! missing username'
+        data = json.dumps(dat)
+        return data
+
+    username = req['username']
+
+    cur.execute("SELECT * FROM users WHERE username=%s", (username,))
+    user = cur.fetchone()
+
+    if user != None:
+
+
+        cur.execute("UPDATE users SET active=False WHERE username=%s", (username,))
+        conn.commit()
+
+        # return result
+        dat = dict()
+        dat['result'] = 'Status code 200 ok'
+        data = json.dumps(dat)
+        return data
+
+    else:
+        # return result
+        dat = dict()
+        err['result'] = 'ERROR! no user with given username'
+        data = json.dumps(dat)
+        return data
 
 
 if __name__ == "__main__":
