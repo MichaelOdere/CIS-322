@@ -1,0 +1,65 @@
+# File: test_report_wk10.txt
+# Description: A walkthrough of the presented TestPlan.pdf
+# Author: Zachary Penn Lunte
+# Date: 2017 March 19
+
+Test 1 - Create User
+--------------------
+
+1. It would have been helpful to have some notes about the initial setup. For example, when I created the database, I used the command
+
+    createdb lost
+
+This caused an internal server error that prevented any part of the web app from loading. Looking in the error logs I realized that the database needed to be name "lost_db" for anything to work properly, so I recreated the database under that name and things worked. It might be better in the future to not hardcode the database name anywhere in the source code.
+
+2. Username creation text field works perfectly.
+
+3. User password creation text field works perfectly.
+
+4. Here it might be better to use some input method that restricts user input to the available roles. A drop down menu would be good. A text entry field is not very user friendly or safe, but it works!
+
+5. Creating a user with the role 'facilities officer' works.
+
+6. I noticed that if I entered a username and password that already existed, but left the role field empty, then the creation continued successfully, which is not desired, because that would suggest there are now two users with the same name and password, and one of them doesn't have a role. That's not good! But if all the fields are filled out and exactly match some previous user's specifications, then I do get taken to a 'username already exists page'.
+
+Test 2 - Login to the system
+
+1. Login works fine.
+
+2. User credentials seem to work.
+
+3. Redirect to dashboard works well.
+
+4. Facilities Officers have a different dashboard than Logistics Officers.
+
+Test 3 - Add two Facilities
+
+1. add_facility page exists and has proper features.
+
+2, 3. Facilities with different names and codes can be added successfully.
+
+4. Redirects to a 'facility already exists' page if the facility name or code already exists.
+
+Test 4 - Add two assets
+
+1. add_asset page exists and has proper features.
+
+2, 3. Assets with different names and tags can be added successfully.
+
+4. Redirects to a 'asset already exists' page if the asset tag already exists.
+
+Test 5 - Complete the asset transit proves
+
+1, 2, 3, 4. Everything here seems to work fine, but if the error occurred earlier where two users have the same credentials, there can be problems with any logistics officer that shares a username with another user.
+
+5, 6, 7, 8, 9. Everything here works as expected.
+
+Test 6 - Dispose of an Asset
+
+1, 2, 3, 4. Assets can be disposed successfully.
+
+Test 7 - Run Report
+
+1, 2, 3. Everything here works as expected.
+
+NOTES: I only really encountered two main problems. The database name is hardcoded somewhere in the source code and the test plan does not specify what database name must be chosen for the web application to work properly. The database name needed turned out to be "lost_db". The other problem was that in the user creation page it is possible to create a new user with a username that has already been used by leaving the role field blank. This can cause problems later on in the application. Everything else seems to work properly!
