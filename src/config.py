@@ -13,7 +13,3 @@ with cpath.open() as conf:
     dbhost = c['database']['dbhost']
     dbport = c['database']['dbport']
 
-    lost_priv = c['crypto']['lost_priv']
-    lost_pub  = c['crypto']['lost_pub']
-    user_pub  = c['crypto']['user_pub']
-prod_pub = c['crypto']['prod_pub']
