@@ -16,7 +16,7 @@ cur.execute("SELECT title FROM roles WHERE (title=%s)",[role])
 if (cur.fetchone() is None):
     cur.execute("INSERT INTO roles (title) VALUES (%s)", [role])
     conn.commit()
-    
+
 cur.execute("UPDATE users SET role_fk=(SELECT role_pk FROM roles WHERE title=%s) WHERE username=%s", (role,username))
 
 username = "fac"
@@ -41,20 +41,18 @@ name = 'cali'
 code = 2
 cur.execute("INSERT INTO facilities (common_name, facility_code) VALUES (%s,%s)",(name,code))
 
-tag = "1"
+asset_tag = "1"
 description = 'lol'
 facility = 2
 arrive = datetime.datetime.now()
-cur.execute("INSERT INTO assets (tag, description) VALUES (%s, %s)", (tag, description))
-cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='oregon'),%s)",(tag, arrive))
+cur.execute("INSERT INTO assets (asset_tag, description) VALUES (%s, %s)", (asset_tag, description))
+cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='oregon'),%s)",(asset_tag, arrive))
 
-tag ="2"
+asset_tag ="2"
 description = 'fake'
 facility = 2
 arrive = datetime.datetime.now()
-cur.execute("INSERT INTO assets (tag, description) VALUES (%s, %s)", (tag, description))
-cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='cali'),%s)",(tag,  arrive))
+cur.execute("INSERT INTO assets (asset_tag, description) VALUES (%s, %s)", (asset_tag, description))
+cur.execute("INSERT INTO asset_location (asset_fk, facility_fk, arrive) VALUES ((SELECT asset_pk FROM assets WHERE asset_tag=%s),(SELECT facility_pk FROM facilities  WHERE common_name='cali'),%s)",(asset_tag,  arrive))
 
 conn.commit()
-
-
