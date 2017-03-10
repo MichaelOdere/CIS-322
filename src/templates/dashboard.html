@@ -18,7 +18,7 @@
 		</tr>
 	        {% for task in session.dashboard %}
                 <tr>
-                    <td><a href="{{url_for('update_transit')}}?transfer_pk={{task.transfer_pk}}&tag={{task.tag}}">{{task.tag}}</td>
+                    <td><a href="{{url_for('update_transit')}}?transfer_pk={{task.transfer_pk}}&asset_tag={{task.asset_tag}}">{{task.asset_tag}}</td>
 		    <td>{{task.description}}</td>
 	        </tr>
 	        {% endfor %}
@@ -28,13 +28,13 @@
 	{% if session.role.lower() == 'facilities officer' %}
             Transfer Requests to Approve:<br><br>
             <table border="2">
-            <tr> 
+            <tr>
     	        <th>Asset</th>
 		<th>Destination Facility</th>
 	    </tr>
 	    {% for task in session.dashboard %}
 	        <tr>
-	            <td><a href="{{url_for('approve_req')}}?transfer_pk={{task.transfer_pk}}&approval_tag={{task.tag}}">{{task.tag}}</a></td>
+	            <td><a href="{{url_for('approve_req')}}?transfer_pk={{task.transfer_pk}}&approval_tag={{task.asset_tag}}">{{task.asset_tag}}</a></td>
 	   	    <td>{{task.destination_facility}}</td>
 		</tr>
 	    {% endfor %}

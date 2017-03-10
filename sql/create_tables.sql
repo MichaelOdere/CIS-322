@@ -13,14 +13,14 @@ CREATE TABLE users (
 
 CREATE TABLE assets(
     asset_pk     serial primary key, /*numeric primary key to keep track of assets*/
-    tag          varchar(16),        /*an asset tag upto 16 characters in length*/
+    asset_tag          varchar(16),        /*an asset tag upto 16 characters in length*/
     description  varchar(128),
     disposed     boolean default false,
     in_transit   boolean default false
 );
 
 CREATE TABLE facilities(
-    facility_pk   serial primary key, /*numeric primary key to keep track of facilities*/ 
+    facility_pk   serial primary key, /*numeric primary key to keep track of facilities*/
     common_name   varchar(32),        /*name of the facility up to 32 charaters*/
     facility_code varchar(8)          /*facility code up to eight characters*/
 );
@@ -37,11 +37,11 @@ CREATE TABLE transfers(
     requester_fk int REFERENCES users (user_pk) default null, /*references the user_pk for who initiated transfer*/
     approver_fk  int REFERENCES users (user_pk) default null, /*references the user_pk for who approved the transfer*/
     asset_fk     int REFERENCES assets (asset_pk) default null, /*references the asset to be transfered */
-    src_fk       int REFERENCES facilities (facility_pk) default null, /*references facility_pk the transfer was initiated from */    
+    src_fk       int REFERENCES facilities (facility_pk) default null, /*references facility_pk the transfer was initiated from */
     dest_fk      int REFERENCES facilities (facility_pk) default null, /*references facility_pk the transfer was sent to */
     request_dt   timestamp default null, /*time the request for the transfer was made*/
     approved_dt  timestamp default null, /*time the request for the transfer was approved*/
     load_dt      timestamp default null, /*time asset was loaded*/
     unload_dt    timestamp default null  /*time assed was unloaded*/
-    
+
 );

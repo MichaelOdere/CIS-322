@@ -1,4 +1,4 @@
-<html> 
+<html>
     <body>
 			<h1 align = 'center'> Add Asset </h1>
 			<table border="1">
@@ -8,7 +8,7 @@
 			  </tr>
 				{% for entry in session.assets %}
 				<tr>
-		    	<td>{{entry.tag}}</td>
+		    	<td>{{entry.asset_tag}}</td>
 			    <td>{{entry.description}}</td>
 				</tr>
 				{% endfor %}
@@ -16,7 +16,7 @@
 			<br>
 			<form action="{{url_for('add_asset')}}" method='POST'>
 		    Asset Tag:<br>
-		    <input type='text' name='tag'><br>
+		    <input type='text' name='asset_tag'><br>
 		    Description:<br>
 		    <input type='text' name='description'><br>
 		    Asset Location:<br>
@@ -28,7 +28,7 @@
 		    Asset Arrive:<br>
 		    <input type='date' name='arrive', value='1000-01-01'><br>
 		    <input type='submit' value='Submit'>
-		 	</form> 
+		 	</form>
 		 	<br>
   	</body>
 </html>
